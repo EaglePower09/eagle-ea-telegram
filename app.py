@@ -29,4 +29,4 @@ def generate_signal():
 def send_to_telegram(signal):
     text = (
         f"📡 *Eagle EA Scalper Signal*\n"
-        f"Pair: `{signal['pair
+        f"Pair: {signal['pair']}"
