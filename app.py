@@ -1,5 +1,5 @@
-import requests
 from flask import Flask, request, jsonify
+import requests
 
 app = Flask(__name__)
 
@@ -13,14 +13,17 @@ def send_telegram_message(message):
         'text': message,
         'parse_mode': 'Markdown'
     }
-    response = requests.post(url, data=payload)
-    return response.json()
+    requests.post(url, data=payload)
+
+@app.route('/')
+def home():
+    return jsonify({"status": "Eagle EA Telegram Bot is live"})
 
 @app.route('/signal', methods=['POST'])
-def send_signal():
+def signal():
     data = request.get_json()
 
-    signal_text = f"""📡 *Eagle EA Scalper Signal*
+    message = f"""📡 *Eagle EA Scalper Signal*
 
 🕒 Time: {data.get('time')}
 💱 Pair: {data.get('symbol')}
@@ -32,9 +35,8 @@ def send_signal():
 🎯 TP: {data.get('tp')}
 🛑 SL: {data.get('sl')}"""
 
-    result = send_telegram_message(signal_text)
-
-    return jsonify({'status': 'sent', 'telegram_result': result})
+    send_telegram_message(message)
+    return jsonify({'status': 'Signal sent to Telegram'})
 
 if __name__ == '__main__':
-    app.run()
+    app.run(debug=True)
