@@ -1,32 +1,40 @@
-from flask import Flask, jsonify
-import random
 import requests
+from flask import Flask, request, jsonify
 
 app = Flask(__name__)
 
-# === Telegram Bot Setup ===
-BOT_TOKEN = 'YOUR_BOT_TOKEN'  # 🔁 Replace with your Telegram bot token
-CHAT_ID = 'YOUR_CHAT_ID'      # 🔁 Replace with your Telegram chat ID
+TELEGRAM_BOT_TOKEN = '7959778482:AAFgqgf01UFX4QCKkYuNBiT4jt557m7LQuE'
+TELEGRAM_CHAT_ID = '7959778482'
 
-# === Signal Generator Function ===
-def generate_signal():
-    pairs = ['XAUUSD', 'NAS100', 'US30', 'GER40', 'EURUSD', 'USDJPY',
-             'GBPUSD', 'GBPAUD', 'GBPJPY', 'AUDCAD', 'USDCHF', 'NZDUSD']
-    directions = ['Buy', 'Sell']
-    sessions = ['Asian', 'London', 'New York']
-    modes = ['Sniper', 'Normal', 'Aggressive']
-    
-    signal = {
-        "pair": random.choice(pairs),
-        "direction": random.choice(directions),
-        "session": random.choice(sessions),
-        "mode": random.choice(modes),
-        "confidence": f"{random.randint(70, 95)}%"
+def send_telegram_message(message):
+    url = f'https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}/sendMessage'
+    payload = {
+        'chat_id': TELEGRAM_CHAT_ID,
+        'text': message,
+        'parse_mode': 'Markdown'
     }
-    return signal
+    response = requests.post(url, data=payload)
+    return response.json()
 
-# === Send Signal to Telegram ===
-def send_to_telegram(signal):
-    text = (
-        f"📡 *Eagle EA Scalper Signal*\n"
-        f"Pair: {signal['pair']}" )
+@app.route('/signal', methods=['POST'])
+def send_signal():
+    data = request.get_json()
+
+    signal_text = f"""📡 *Eagle EA Scalper Signal*
+
+🕒 Time: {data.get('time')}
+💱 Pair: {data.get('symbol')}
+🎯 Mode: {data.get('mode')}
+📊 Session: {data.get('session')}
+⚡ Confidence: {data.get('confidence')}%
+
+📍 Entry: {data.get('entry')}
+🎯 TP: {data.get('tp')}
+🛑 SL: {data.get('sl')}"""
+
+    result = send_telegram_message(signal_text)
+
+    return jsonify({'status': 'sent', 'telegram_result': result})
+
+if __name__ == '__main__':
+    app.run()
