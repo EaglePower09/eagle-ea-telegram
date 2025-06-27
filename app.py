@@ -13,7 +13,9 @@ def send_telegram_message(message):
         'text': message,
         'parse_mode': 'Markdown'
     }
-    requests.post(url, data=payload)
+    response = requests.post(url, data=payload)
+    print(response.status_code)
+    print(response.text)
 
 @app.route('/')
 def home():
