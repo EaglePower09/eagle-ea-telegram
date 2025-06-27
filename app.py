@@ -7,9 +7,9 @@ TELEGRAM_BOT_TOKEN = '7959778482:AAFgqgf01UFX4QCKkYuNBiT4jt557m7LQuE'
 TELEGRAM_CHAT_ID = '7959778482'
 
 def send_telegram_message(message):
-    url = f'https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}/sendMessage'
+    url = f'https://api.telegram.org/bot{7959778482:AAFgqgf01UFX4QCKkYuNBiT4jt557m7LQuE}/sendMessage'
     payload = {
-        'chat_id': TELEGRAM_CHAT_ID,
+        'chat_id': 7959778482,
         'text': message,
         'parse_mode': 'Markdown'
     }
