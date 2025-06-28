@@ -1,10 +1,14 @@
-from flask import Flask, request, jsonify
+from flask import Flask, jsonify
 import requests
 
 app = Flask(__name__)
 
+# === Your Telegram Bot Details ===
 TELEGRAM_BOT_TOKEN = '7959778482:AAFgqgf01UFX4QCKkYuNBiT4jt557m7LQuE'
 TELEGRAM_CHAT_ID = '6105818531'
+
+# === Your Live Signal API ===
+SIGNAL_API_URL = 'https://eagle-ea-api.onrender.com/'
 
 def send_telegram_message(message):
     url = f'https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}/sendMessage'
@@ -15,44 +19,40 @@ def send_telegram_message(message):
     }
     try:
         response = requests.post(url, data=payload)
-        print(f"Telegram response: {response.status_code} - {response.text}")
+        print(f"✅ Sent to Telegram: {response.status_code}")
     except Exception as e:
-        print(f"Error sending Telegram message: {e}")
+        print(f"❌ Telegram Error: {e}")
 
 @app.route('/')
 def home():
-    return jsonify({"status": "Eagle EA Telegram Bot is live"})
+    return jsonify({"status": "✅ Eagle EA Telegram Bot is running."})
 
-@app.route('/signal', methods=['POST'])
-def signal():
+@app.route('/send', methods=['GET'])
+def send_signal():
     try:
-        data = request.get_json()
+        response = requests.get(SIGNAL_API_URL)
+        signal = response.json()
 
-        # Required fields
-        required_fields = ['time', 'symbol', 'mode', 'session', 'confidence', 'entry', 'tp', 'sl']
-        for field in required_fields:
-            if field not in data:
-                return jsonify({"error": f"Missing field: {field}"}), 400
+        if signal['mode'] != 'Sniper':
+            return jsonify({"status": "Skipped – Not Sniper Mode"}), 200
 
-        # Format signal message
-        message = f"""📡 *Eagle EA Scalper Signal*
+        message = f"""📡 *Eagle EA Scalper Signal (Sniper)*
 
-🕒 Time: {data['time']}
-💱 Pair: {data['symbol']}
-🎯 Mode: {data['mode']}
-📊 Session: {data['session']}
-⚡ Confidence: {data['confidence']}%
+🕒 Time: {signal['time']}
+💱 Pair: {signal['pair']}
+📈 Direction: {signal['direction']}
+🎯 Mode: {signal['mode']}
+📊 Session: {signal['session']}
+⚡ Confidence: {signal['confidence']}
 
-📍 Entry: {data['entry']}
-🎯 TP: {data['tp']}
-🛑 SL: {data['sl']}"""
+✅ Result: {signal['result']}"""
 
         send_telegram_message(message)
-        return jsonify({"status": "Signal sent to Telegram"}), 200
+        return jsonify({"status": "Sniper Signal Sent"}), 200
 
     except Exception as e:
-        print(f"Error in /signal: {e}")
-        return jsonify({"error": "Internal Server Error"}), 500
+        print(f"❌ Error: {e}")
+        return jsonify({"error": "Failed to fetch or send signal"}), 500
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=10000)
