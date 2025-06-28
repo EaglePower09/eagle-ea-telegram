@@ -48,3 +48,9 @@ def send():
         return "OK", 200  # ⬅ Small response for cron-job.org
     except Exception:
         return "Internal Error", 500
+
+import os
+
+if __name__ == '__main__':
+    port = int(os.environ.get('PORT', 5000))  # Get PORT from environment
+    app.run(host='0.0.0.0', port=port)
