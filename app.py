@@ -3,14 +3,13 @@ import requests
 
 app = Flask(__name__)
 
-# ✅ Your correct bot token and chat ID
 TELEGRAM_BOT_TOKEN = '7959778482:AAFgqgf01UFX4QCKkYuNBiT4jt557m7LQuE'
 TELEGRAM_CHAT_ID = '6105818531'
 
 def send_telegram_message(message):
-    url = f'https://api.telegram.org/bot{7959778482:AAFgqgf01UFX4QCKkYuNBiT4jt557m7LQuE}/sendMessage'
+    url = f'https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}/sendMessage'
     payload = {
-        'chat_id': 6105818531,
+        'chat_id': TELEGRAM_CHAT_ID,
         'text': message,
         'parse_mode': 'Markdown'
     }
@@ -29,12 +28,13 @@ def signal():
     try:
         data = request.get_json()
 
-        # Validate required fields
+        # Required fields
         required_fields = ['time', 'symbol', 'mode', 'session', 'confidence', 'entry', 'tp', 'sl']
         for field in required_fields:
             if field not in data:
                 return jsonify({"error": f"Missing field: {field}"}), 400
 
+        # Format signal message
         message = f"""📡 *Eagle EA Scalper Signal*
 
 🕒 Time: {data['time']}
