@@ -45,10 +45,6 @@ def send():
 🛑 SL: {data['sl']}"""
 
         send_telegram_message(message)
-        return "Signal Sent", 200
-
+        return "OK", 200  # ⬅ Small response for cron-job.org
     except Exception:
         return "Internal Error", 500
-
-if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=10000)
